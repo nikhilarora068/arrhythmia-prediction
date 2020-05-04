@@ -7,7 +7,7 @@ import tensorflow
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
 import numpy as np
 
-model = tensorflow.keras.models.load_model('model3.h5')
+model = tensorflow.keras.models.load_model('/home/Linux/Predict_types_of_arrhythmia.h5')
 print('loaded model')
 
 
@@ -31,7 +31,33 @@ def home(request):
         pred = model.predict(image.reshape((1, 128, 128, 3)))
         pred_class = pred.argmax(axis=-1)
 
-        probability = pred[0][0]
+        # 'N','A','V','P','R','f','L'
+        N = pred[0][0]
+        A = pred[0][1]
+        V = pred[0][2]
+        P = pred[0][3]
+        R = pred[0][4]
+        L = pred[0][6]
+
+        probability = -1
+
+        type = ""
+        if (N < 0.5):
+            probability = max(A, L, P, R, V)
+            if (probability == A):
+                type = 'A'
+            elif (probability == L):
+                type = 'L'
+            elif (probability == P):
+                type = 'P'
+            elif (probability == R):
+                type = 'R'
+            else:
+                type = 'V'
+        else:
+            probability = N
+
+        # probability = pred[0][0]
 
         print("probability = ", probability)
 
@@ -54,12 +80,27 @@ def home(request):
 
 
         print("DONEEEE")
-        context = {
-            'image': input_image,
-            'result': prediction,
-            'status': status,
-            'accuracy': accuracy
-        }
+        if (status == 1):
+            context = {
+                'image': input_image,
+                'result': prediction,
+                'status': status,
+                'accuracy': accuracy
+            }
+        else:
+            context = {
+                'image': input_image,
+                'result': prediction,
+                'status': status,
+                'types': type,
+                'accuracy': accuracy
+            }
+        # context = {
+        #     'image': input_image,
+        #     'result': prediction,
+        #     'status': status,
+        #     'accuracy': accuracy
+        # }
 
 
         return render(request, 'index.html', context)
