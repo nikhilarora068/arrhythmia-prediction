@@ -38,7 +38,7 @@ def home(request):
         N = pred[0][2]
         P = pred[0][3]
         R = pred[0][4]
-        V = pred[0][6]
+        V = pred[0][5]
 
         type = ""
         status = 0
