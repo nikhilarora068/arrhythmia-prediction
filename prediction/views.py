@@ -8,6 +8,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator, img_to_arra
 import numpy as np
 
 model = tensorflow.keras.models.load_model('/home/Linux/Predict_types_of_arrhythmia.h5')
+# model = tensorflow.keras.models.load_model('/Users/NikhilArora/desktop/model3.h5')
 print('loaded model')
 
 
@@ -31,77 +32,38 @@ def home(request):
         pred = model.predict(image.reshape((1, 128, 128, 3)))
         pred_class = pred.argmax(axis=-1)
 
-        # 'N','A','V','P','R','f','L'
-        N = pred[0][0]
-        A = pred[0][1]
-        V = pred[0][2]
+        # folder order 'L' 'N' 'P' 'R' 'V'
+
+        L = pred[0][1]
+        N = pred[0][2]
         P = pred[0][3]
         R = pred[0][4]
-        L = pred[0][6]
-
-        probability = -1
+        V = pred[0][6]
 
         type = ""
-        if (N < 0.5):
-            probability = max(A, L, P, R, V)
-            if (probability == A):
-                type = 'A'
-            elif (probability == L):
-                type = 'L'
-            elif (probability == P):
-                type = 'P'
-            elif (probability == R):
-                type = 'R'
-            else:
-                type = 'V'
-        else:
-            probability = N
+        status = 0
+        probability = max(L, N, P, R, V)
 
-        # probability = pred[0][0]
+        if probability == N:
+            type = 'Normal heartbeat'
+            status = 1
+        elif probability == L:
+            type = 'Left bundle branch block beat'
+        elif probability == P:
+            type = 'Paced beat'
+        elif probability == R:
+            type = 'Right bundle branch block beat'
+        elif probability == V:
+            type = 'Premature ventricular contraction'
 
         print("probability = ", probability)
 
-        prediction = ""
-        status = -1
-        accuracy = 0
-
-        if probability > 0.5:
-            prediction = "NO ARRHYTHMIA"
-            status = 1
-            accuracy = ("%.2f" % (probability * 100))
-            print("%.2f" % (probability * 100) + "% normal")
-        else:
-            prediction = "ARRHYTHMIA"
-            status = 0
-            accuracy = ("%.2f" % ((1 - probability) * 100))
-            print("%.2f" % ((1 - probability) * 100) + "% arrhythmia")
-
-
-
-
-        print("DONEEEE")
-        if (status == 1):
-            context = {
-                'image': input_image,
-                'result': prediction,
-                'status': status,
-                'accuracy': accuracy
-            }
-        else:
-            context = {
-                'image': input_image,
-                'result': prediction,
-                'status': status,
-                'types': type,
-                'accuracy': accuracy
-            }
-        # context = {
-        #     'image': input_image,
-        #     'result': prediction,
-        #     'status': status,
-        #     'accuracy': accuracy
-        # }
-
+        context = {
+            'image': input_image,
+            'status': status,
+            'accuracy': probability,
+            'type': type
+        }
 
         return render(request, 'index.html', context)
 
