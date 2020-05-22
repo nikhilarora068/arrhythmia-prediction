@@ -7,8 +7,8 @@ import tensorflow
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
 import numpy as np
 
-model = tensorflow.keras.models.load_model('/home/Linux/Predict_types_of_arrhythmia.h5')
-# model = tensorflow.keras.models.load_model('/Users/NikhilArora/desktop/model3.h5')
+# model = tensorflow.keras.models.load_model('/home/Linux/Predict_types_of_arrhythmia.h5')
+model = tensorflow.keras.models.load_model('/Users/NikhilArora/desktop/Major-II/breakthrough/model3.h5')
 print('loaded model')
 
 
@@ -74,5 +74,3 @@ def home(request):
 
 def temp(request):
     return render(request, 'test.html')
-
-
